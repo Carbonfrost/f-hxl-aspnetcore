@@ -6,7 +6,7 @@
   <Import Project="$(MSBuildThisFileDirectory)/src/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design.props"/>
 
   <PropertyGroup>
-    <HxlDesignAssembly>$(MSBuildThisFileDirectory)/src/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design/bin/$(Configuration)/netstandard2.0/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design.dll</HxlDesignAssembly>
+    <HxlCompilerCommand>dotnet tool run hxlc</HxlCompilerCommand>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)/src/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design.targets"/>
