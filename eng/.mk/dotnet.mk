@@ -45,6 +45,7 @@ dotnet/configure: -requirements-dotnet -check-env-NUGET_SOURCE_URL -check-env-NU
 ## Restore package dependencies
 dotnet/restore: -requirements-dotnet
 	@ dotnet restore ./dotnet
+	@ dotnet tool restore
 
 ## Build the dotnet solution
 dotnet/build: dotnet/restore -dotnet/build
