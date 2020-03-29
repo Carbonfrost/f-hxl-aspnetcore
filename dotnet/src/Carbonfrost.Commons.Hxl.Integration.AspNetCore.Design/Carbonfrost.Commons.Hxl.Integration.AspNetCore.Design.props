@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Project>
+  <PropertyGroup>
+    <HxlBaseType>Carbonfrost.Commons.Hxl.Integration.AspNetCore.HxlPage</HxlBaseType>
+    <HxlCompilerCommand>hxlc</HxlCompilerCommand>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_HxlDesignPropsFile>$(MSBuildThisFile)</_HxlDesignPropsFile>
+  </PropertyGroup>
+</Project>

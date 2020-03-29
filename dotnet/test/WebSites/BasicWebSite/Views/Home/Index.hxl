@@ -1,0 +1,6 @@
+<title> Home Page </title>
+<div class="text-center">
+  <h1 class="display-4">Welcome</h1>
+  <p>Learn about <a href="#">building Web apps with HXL</a>.</p>
+  <p>Copyright ${CurrentTime.Year}</p>
+</div>
