@@ -1,0 +1,13 @@
+<!--
+  These targets are imported in development only.  They simulate the use of the MSBuild task
+  package references.
+-->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)/src/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design.props"/>
+
+  <PropertyGroup>
+    <HxlCompilerCommand>dotnet tool run hxlc</HxlCompilerCommand>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)/src/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design/Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design.targets"/>
+</Project>

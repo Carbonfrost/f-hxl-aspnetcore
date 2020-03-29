@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<!--
+
+   Copyright 2020 Carbonfrost Systems, Inc. (https://carbonfrost.com)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+-->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- HACK Do our work when Razor does -->
+    <RazorGenerateDependsOn>
+      _HxlEvaluate;
+      HxlGenerate;
+      HxlCompile;
+      $(RazorGenerateDependsOn)
+    </RazorGenerateDependsOn>
+
+    <CoreCompileDependsOn>
+      $(CoreCompileDependsOn);
+      _HxlEvaluate;
+      GenerateHxlTargetAssemblyInfo
+    </CoreCompileDependsOn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(EnableDefaultItems)' == 'true' And '$(EnableDefaultContentItems)' == 'true'">
+    <Content Include="**\*.hxl"
+             ExcludeFromSingleFile="true"
+             CopyToPublishDirectory="PreserveNewest"
+             Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(DefaultWebContentItemExcludes)" />
+    <None Remove="**\*.hxl" />
+  </ItemGroup>
+
+  <Target Name="HxlCompile" DependsOnTargets="$(HxlCompileDependsOn)" />
+  <Target Name="HxlGenerate" DependsOnTargets="$(HxlGenerateDependsOn)" />
+  <Target Name="PrepareForHxlCompile" DependsOnTargets="$(PrepareForHxlCompileDependsOn)" />
+  <Target Name="ResolveHxlCompileInputs" DependsOnTargets="$(ResolveHxlCompileInputsDependsOn)" />
+
+  <Target Name="_HxlEvaluate">
+    <PropertyGroup>
+      <HxlCompilerCommand Condition="'$(HxlCompilerCommand)'==''">hxlc</HxlCompilerCommand>
+      <HxlGenerateOutputFileExtension>.g.cs</HxlGenerateOutputFileExtension>
+      <HxlTargetNameSuffix
+        Condition="'$(HxlTargetNameSuffix)'==''">.Views</HxlTargetNameSuffix>
+      <GenerateHxlTargetAssemblyInfo Condition="'$(GenerateHxlTargetAssemblyInfo)'==''">true</GenerateHxlTargetAssemblyInfo>
+      <HxlTargetName Condition="'$(HxlTargetName)'==''">$(TargetName)$(HxlTargetNameSuffix)</HxlTargetName>
+      <HxlGenerateIntermediateOutputPath
+        Condition="'$(HxlGenerateIntermediateOutputPath)'==''">$(IntermediateOutputPath)Hxl\</HxlGenerateIntermediateOutputPath>
+      <_HxlAssemblyInfo>$(IntermediateOutputPath)$(MSBuildProjectName).HxlAssemblyInfo.cs</_HxlAssemblyInfo>
+    </PropertyGroup>
+    <ItemGroup>
+      <HxlIntermediateAssembly Condition="'$(HxlIntermediateAssembly)'==''" Include="$(IntermediateOutputPath)$(HxlTargetName).dll" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="ResolveHxlGenerateInputs">
+    <ItemGroup>
+      <HxlGenerate Include="@(Content)" Condition="'%(Content.Extension)'=='.hxl'" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_ResolveHxlGenerateOutputs" Condition="'@(HxlGenerateWithTargetPath)' != ''">
+    <Error Text="HxlGenerateWithTargetPath item '%(HxlGenerateWithTargetPath.Identity)' does not specify required metadata 'GeneratedOutput'."
+           Condition="'%(HxlGenerateWithTargetPath.GeneratedOutput)' == ''" />
+    <ItemGroup>
+      <_HxlGenerateOutput Include="%(HxlGenerateWithTargetPath.GeneratedOutput)" />
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <HxlGenerateDependsOn>
+      ResolveHxlGenerateInputs;
+      AssignHxlGenerateTargetPaths;
+      HxlCoreGenerate
+    </HxlGenerateDependsOn>
+
+    <HxlCoreGenerateDependsOn>
+      _ResolveHxlGenerateOutputs
+    </HxlCoreGenerateDependsOn>
+
+    <PrepareForHxlCompileDependsOn>
+      _HxlEvaluate;
+      HxlGenerate;
+      GenerateHxlTargetAssemblyInfo;
+      ResolveHxlCompileInputs;
+    </PrepareForHxlCompileDependsOn>
+
+    <HxlCompileDependsOn>
+      PrepareForHxlCompile;
+      HxlCoreCompile
+    </HxlCompileDependsOn>
+
+    <ResolveHxlCompileInputsDependsOn>
+      $(ResolveHxlCompileInputsDependsOn);
+      _ResolveGeneratedHxlCompileInputs;
+      _ResolveHxlReferencePath
+    </ResolveHxlCompileInputsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="_ResolveHxlTargetPath" DependsOnTargets="_HxlEvaluate">
+    <PropertyGroup>
+      <HxlOutputPath Condition="'$(HxlOutputPath)'==''">$([MSBuild]::EnsureTrailingSlash('$(OutDir)'))</HxlOutputPath>
+      <HxlTargetDir>$([MSBuild]::Escape($([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::GetFullPath('$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(HxlOutputPath)'))'))))))</HxlTargetDir>
+      <!-- Example, c:\MyProjects\MyProject\bin\debug\MyAssembly.Views.dll -->
+      <HxlTargetPath Condition=" '$(HxlTargetPath)' == '' ">$(HxlTargetDir)$(HxlTargetName).dll</HxlTargetPath>
+    </PropertyGroup>
+  </Target>
+
+  <Target
+    Name="_ResolveHxlReferencePath"
+    DependsOnTargets="ResolveReferences">
+
+    <ItemGroup>
+      <HxlReferencePath Include="@(ReferencePath)" />
+      <HxlReferencePath Include="@(IntermediateAssembly->Metadata('FullPath'))" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_ResolveGeneratedHxlCompileInputs">
+    <ItemGroup>
+      <HxlCompile Include="@(_HxlGenerateOutput)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="AssignHxlGenerateTargetPaths" Condition="'@(HxlGenerate)' != ''">
+    <AssignTargetPath Files="@(HxlGenerate)" RootFolder="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssignedFiles" ItemName="HxlGenerateWithTargetPath" />
+    </AssignTargetPath>
+    <ItemGroup>
+      <HxlGenerateWithTargetPath Condition="'%(HxlGenerateWithTargetPath.GeneratedOutput)' == ''">
+        <GeneratedOutput>$(HxlGenerateIntermediateOutputPath)%(HxlGenerateWithTargetPath.TargetPath)$(HxlGenerateOutputFileExtension)</GeneratedOutput>
+      </HxlGenerateWithTargetPath>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GenerateHxlTargetAssemblyInfo"
+          DependsOnTargets="ResolveHxlGenerateInputs; _HxlEvaluate"
+          Condition="'$(Language)' == 'C#'"
+          Outputs="$(_HxlAssemblyInfo)">
+
+    <PropertyGroup Condition="'@(HxlGenerate->Count())' != '0'">
+      <GenerateHxlAssemblyInfo Condition="'$(GenerateHxlAssemblyInfo)'==''">true</GenerateHxlAssemblyInfo>
+     </PropertyGroup>
+
+    <ItemGroup Condition="'$(GenerateHxlAssemblyInfo)'=='true'">
+      <_HxlAssemblyAttribute Include="Carbonfrost.Commons.Core.Runtime.RelatedAssemblyAttribute">
+        <_Parameter1>$(HxlTargetName)</_Parameter1>
+      </_HxlAssemblyAttribute>
+
+      <Compile Include="$(_HxlAssemblyInfo)" />
+      <FileWrites Include="$(_HxlAssemblyInfo)" />
+    </ItemGroup>
+
+    <WriteCodeFragment AssemblyAttributes="@(_HxlAssemblyAttribute)" Language="$(Language)" OutputFile="$(_HxlAssemblyInfo)" />
+  </Target>
+
+  <Target Name="HxlCoreGenerate"
+          DependsOnTargets="$(HxlCoreGenerateDependsOn)"
+          Inputs="$(MSBuildAllProjects);@(HxlGenerateWithTargetPath)"
+          Outputs="@(_HxlGenerateOutput)">
+    <PropertyGroup>
+      <HxlBaseType Condition=" '$(HxlBaseType)' == '' ">Carbonfrost.Commons.Hxl.Integration.AspNetCore.HxlPage</HxlBaseType>
+      <HxlGenerateArgs>@(HxlGenerate)</HxlGenerateArgs>
+      <ExecArgs>$(HxlCompilerCommand) --no-compile</ExecArgs>
+      <ExecArgs>$(ExecArgs) --out $(HxlGenerateIntermediateOutputPath)</ExecArgs>
+      <ExecArgs>$(ExecArgs) $(HxlGenerateArgs.Replace(';', ' '))</ExecArgs>
+      <ExecArgs>$(ExecArgs) --base-type=$(HxlBaseType)</ExecArgs>
+    </PropertyGroup>
+
+    <RemoveDir Directories="$(HxlGenerateIntermediateOutputPath)"
+               Condition="Exists('$(HxlGenerateIntermediateOutputPath)')" />
+    <MakeDir Directories="%(_HxlGenerateOutput.RelativeDir)"
+             Condition="!Exists('%(_HxlGenerateOutput.RelativeDir)')" />
+
+    <Exec Command="$(ExecArgs)"
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
+
+    <ItemGroup>
+      <FileWrites Include="@(_HxlGenerateOutput)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Called as part of CopyFilesToOutputDirectory - this target is called when building the project to copy
+    files to the output directory.
+  -->
+  <Target
+    Name="_HxlCopyFilesToOutputDirectory"
+    DependsOnTargets="_ResolveHxlTargetPath;HxlCompile"
+    AfterTargets="CopyFilesToOutputDirectory">
+
+    <!-- Copy the HXL dll  -->
+    <Copy
+      SourceFiles="@(HxlIntermediateAssembly)"
+      DestinationFiles="$(HxlTargetPath)"
+      SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+      OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+      Retries="$(CopyRetryCount)"
+      RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+      UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+      UseSymboliclinksIfPossible="$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)"
+      Condition="Exists('@(HxlIntermediateAssembly)') and '$(CopyBuildOutputToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)' != 'true'">
+
+      <Output TaskParameter="DestinationFiles" ItemName="_HxlAssembly" />
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites" />
+    </Copy>
+
+    <Message
+      Importance="High"
+      Text="$(MSBuildProjectName) -&gt; @(_HxlAssembly->'%(FullPath)')"
+      Condition="Exists('@(HxlIntermediateAssembly)') and '$(CopyBuildOutputToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)'!='true'" />
+
+    <!-- Copy the HXL debug information file (.pdb), if any -->
+    <Copy
+      SourceFiles="@(_HxlDebugSymbolsIntermediatePath)"
+      DestinationFolder="$(HxlOutputPath)"
+      SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+      OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+      Retries="$(CopyRetryCount)"
+      RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+      UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+      UseSymboliclinksIfPossible="$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)"
+      Condition="Exists('@(_HxlDebugSymbolsIntermediatePath)') and '$(SkipCopyingSymbolsToOutputDirectory)' != 'true' and '$(CopyOutputSymbolsToOutputDirectory)'=='true'">
+
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites" />
+    </Copy>
+  </Target>
+
+  <Import Project="HxlCompilationSupport.targets" />
+</Project>

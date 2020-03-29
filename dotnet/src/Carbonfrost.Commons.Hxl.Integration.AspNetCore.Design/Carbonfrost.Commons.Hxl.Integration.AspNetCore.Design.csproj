@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../../Build.props" />
+    <PropertyGroup>
+      <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
+      <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+      <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+
+      <!-- Don't bother warning about SemVer pre-2.0 -->
+      <NoWarn>NU5105</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="*.props">
+        <Pack>true</Pack>
+        <PackagePath>build/</PackagePath>
+      </Content>
+
+      <Content Include="*.targets">
+        <Pack>true</Pack>
+        <PackagePath>build/</PackagePath>
+      </Content>
+
+      <None Include="_._">
+        <Pack>true</Pack>
+        <PackagePath>lib/netstandard2.0;lib/netcoreapp3.0</PackagePath>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Carbonfrost.Commons.Core" Version="0.3.0" />
+      <PackageReference Include="Carbonfrost.Commons.Core.Runtime.Expressions" Version="0.2.0" />
+      <PackageReference Include="Carbonfrost.Commons.Web.Dom" Version="0.4.0" />
+      <PackageReference Include="Carbonfrost.Commons.Html" Version="0.3.0" />
+      <PackageReference Include="Carbonfrost.Commons.PropertyTrees" Version="0.2.0" />
+      <PackageReference Include="Carbonfrost.Commons.Instrumentation" Version="0.1.1" />
+      <PackageReference Include="Carbonfrost.Commons.Hxl" Version="0.2.0" />
+      <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0" />
+      <PackageReference Include="Microsoft.Build.Framework" Version="15.1.548" PrivateAssets="All" />
+    </ItemGroup>
+</Project>
