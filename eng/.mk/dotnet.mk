@@ -23,14 +23,7 @@
 #
 .PHONY: dotnet/restore dotnet/build dotnet/test dotnet/publish dotnet/push
 
-# The configuration to build (probably "Debug" or "Release")
-CONFIGURATION?=Release
-
-# The framework to publish
-FRAMEWORK?=netcoreapp3.0
-
-# The location of the NuGet configuration file
-NUGET_CONFIG_FILE?=./nuget.config
+-include variables.mk
 
 ## Set up dotnet configuration for NuGet
 dotnet/configure: -requirements-dotnet -check-env-NUGET_SOURCE_URL -check-env-NUGET_PASSWORD -check-env-NUGET_USER_NAME -check-env-NUGET_CONFIG_FILE
@@ -73,7 +66,7 @@ dotnet/clean:
 
 -dotnet/publish: -requirements-dotnet -check-env-CONFIGURATION
 	@ eval $(shell eng/build_env); \
-		dotnet publish --configuration $(CONFIGURATION) --framework $(FRAMEWORK) --no-build ./dotnet
+		dotnet publish --configuration $(CONFIGURATION) --no-build ./dotnet
 
 # Nuget CLI doesn't work with GitHub package registry for some reason, so we're using a curl directly
 -dotnet/push: -requirements-dotnet -check-env-NUGET_PASSWORD -check-env-NUGET_USER_NAME -check-env-NUGET_UPLOAD_URL

@@ -4,6 +4,13 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <RootNamespace></RootNamespace>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Copyright>Copyright 2020 Carbonfrost Systems, Inc.</Copyright>
+    <Authors>Carbonfrost</Authors>
+    <Description>
+      Unit tests for Carbonfrost.Commons.Hxl.Integration.AspNetCore
+    </Description>
+    <RepositoryUrl>https://github.com/Carbonfrost/f-hxl-aspnetcore</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

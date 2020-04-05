@@ -1,12 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="../../Build.props" />
     <PropertyGroup>
+      <PackageId>Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design</PackageId>
+      <RootNamespace>Carbonfrost.Commons.Hxl.Integration.AspNetCore.Design</RootNamespace>
       <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
+      <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+      <Copyright>Copyright 2020 Carbonfrost Systems, Inc.</Copyright>
+      <Authors>Carbonfrost</Authors>
+      <Description>
+        HXL integration for ASP.NET Core
+      </Description>
       <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
       <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+      <IncludeSymbols>true</IncludeSymbols>
+      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
       <!-- Don't bother warning about SemVer pre-2.0 -->
       <NoWarn>NU5105</NoWarn>
+      <RepositoryUrl>https://github.com/Carbonfrost/f-hxl-aspnetcore</RepositoryUrl>
+      <PackageProjectUrl>https://github.com/Carbonfrost/f-hxl-aspnetcore</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>

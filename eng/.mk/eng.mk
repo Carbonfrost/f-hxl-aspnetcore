@@ -1,10 +1,13 @@
 #
 # Various commands for the Engineering platform itself
 #
-.PHONY: release/requirements eng/update
+.PHONY: release/requirements eng/check eng/update
 
 release/requirements:
 	@ eng/release_requirements
+
+eng/check:
+	@ eng/check_csproj
 
 eng_update_file:=$(shell mktemp)
 
