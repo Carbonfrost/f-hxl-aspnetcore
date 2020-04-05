@@ -4,6 +4,7 @@
     <PackageId>Carbonfrost.Commons.Hxl.Integration.AspNetCore</PackageId>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
     <RootNamespace>Carbonfrost.Commons.Hxl.Integration.AspNetCore</RootNamespace>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Copyright>Copyright 2020 Carbonfrost Systems, Inc.</Copyright>
